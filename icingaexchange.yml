@@ -1,0 +1,18 @@
+name: check_sx
+description: "file:///README.md"
+url: "https://github.com/Steinblock/check_sx"
+tags: SX3000-GB
+vendor: silex
+target: Hardware, USB, Device Server
+type: Plugin
+license: apache2.0
+releases: 
+  - 
+    name: 1.0
+    description: "1.0 Release"
+    files: 
+      - 
+        name: check_sx.pl
+        url: "file:///check_sx.pl"
+        description: "First release"
+        checksum: 99d56f2f461ae630dfdc9f3033e33012
