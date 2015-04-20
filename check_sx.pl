@@ -118,15 +118,6 @@ sub print_help () {
         print "     Print version information\n\n";
 }
  
- 
- 
-#print "Given Options:\n";
-#printf ("Hostname: %s\n",$opt_H);
-#printf ("Port: %i\n",$opt_p);
-#printf ("Warning %s\n",$opt_w);
-#printf ("Critical %s\n",$opt_c);
-
-
 my $url = "http://$opt_H:$opt_p/en/status/devstat.htm";
 my $html = get("$url");
 unless (length($html)) {
@@ -170,23 +161,26 @@ foreach my $line (split("\n", $html)) {
 }
 
 
-if (! $found && defined($opt_i)) {
+if (!$found && defined($opt_i)) {
+	# Device with given id not found
 	print "Device [$opt_i] not found\n";
 	exit $ERRORS{'CRITICAL'};
-} elsif (! $found && defined($opt_n)) {
+} elsif (!$found && defined($opt_n)) {
+	# Device with given name not found
 	print "Device '$opt_n' not found\n";
 	exit $ERRORS{'CRITICAL'};
 } elsif ($client =~ /Not Connected/i) {
-	print "Device '$devicename' [$deviceid] not connected\n";
+	# device present but not connected. Include expected client in output to help admin find the right host
+	print defined($opt_C)
+		? "Device '$devicename' [$deviceid] not connected to $opt_C\n"
+		: "Device '$devicename' [$deviceid] not connected\n";
 	exit $ERRORS{'CRITICAL'};
+} elsif (defined($opt_C) && $opt_C ne $client) {
+	# device present but connected to wrong client
+	print "Device '$devicename' [$deviceid] connected to wrong $client since $duration\n";
+	exit $ERRORS{'CRITICAL'};	
 } else {
-
-        # perform check agains client name or ip address if specified
-        if(defined($opt_C) && $opt_C ne $client) {
-		print "Device '$devicename' [$deviceid] connected to wrong $client since $duration\n";
-		exit $ERRORS{'CRITICAL'};
-        } else {
-		print "Device '$devicename' [$deviceid] connected to $client since $duration\n";
-		exit $ERRORS{'OK'};
-        }
+	# device present and connected to expected client
+	print "Device '$devicename' [$deviceid] connected to $client since $duration\n";
+	exit $ERRORS{'OK'};
 }
